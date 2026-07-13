@@ -3,11 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { Table, type Column } from "../../../components/UI/Table/Table";
 import type { Line } from "../../../types/types";
 import { useLines } from "../../../hooks/useLines";
+import { useState } from "react";
 
 export const AdminLine = () => {
   const { lines, loading, createLine, updateLine } = useLines();
 
   const navigate = useNavigate();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingLine, setEditingLine] = useState<Line | null>(null);
 
   const columns: Column<Line>[] = [
     {
