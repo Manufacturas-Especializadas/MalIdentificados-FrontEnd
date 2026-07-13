@@ -6,6 +6,7 @@ import { useLines } from "../../../hooks/useLines";
 import { useState } from "react";
 import { Modal } from "../../../components/UI/Modal/Modal";
 import { LineForm } from "./Form/LineForm";
+import { formatDate } from "../../../utils/formatDate";
 
 export const AdminLine = () => {
   const { lines, loading, createLine, updateLine } = useLines();
@@ -68,7 +69,7 @@ export const AdminLine = () => {
     },
     {
       header: "Fecha de registro",
-      accessor: "createdAt",
+      accessor: (row) => formatDate(row.createdAt),
     },
     {
       header: "Acciones",
