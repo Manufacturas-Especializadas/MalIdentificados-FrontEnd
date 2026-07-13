@@ -4,6 +4,8 @@ import { Table, type Column } from "../../../components/UI/Table/Table";
 import type { Line } from "../../../types/types";
 import { useLines } from "../../../hooks/useLines";
 import { useState } from "react";
+import { Modal } from "../../../components/UI/Modal/Modal";
+import { LineForm } from "./Form/LineForm";
 
 export const AdminLine = () => {
   const { lines, loading, createLine, updateLine } = useLines();
@@ -158,6 +160,21 @@ export const AdminLine = () => {
           )}
         </main>
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title={
+          editingLine ? "Editar Línea de Producción" : "Registrar Nueva Línea"
+        }
+        maxWidth="md"
+      >
+        <LineForm
+          initialData={editingLine}
+          onSubmit={handleFormSubmit}
+          onCancel={handleCloseModal}
+        />
+      </Modal>
     </div>
   );
 };
