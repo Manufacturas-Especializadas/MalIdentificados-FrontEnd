@@ -82,15 +82,15 @@ export const AdminLine = () => {
           </button>
           {row.isActive && (
             <button
-              // onClick={() => {
-              //   if (
-              //     confirm(
-              //       `¿Seguro que deseas dar de baja el área "${row.name}"?`,
-              //     )
-              //   ) {
-              //     deleteArea(row.areaId, row.name);
-              //   }
-              // }}
+              onClick={async () => {
+                if (
+                  confirm(
+                    `¿Seguro que deseas dar de baja la línea "${row.lineName}"?`,
+                  )
+                ) {
+                  await updateLine(row.id, row.lineName, false);
+                }
+              }}
               className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md 
               transition-colors cursor-pointer"
             >
