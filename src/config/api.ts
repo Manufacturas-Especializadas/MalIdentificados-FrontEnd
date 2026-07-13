@@ -9,6 +9,7 @@ export const API_CONFIG = {
   endpoints: {
     lines: {
       getLines: "/api/Lines/getLines",
+      create: "/api/Lines/create",
     },
   },
 };
