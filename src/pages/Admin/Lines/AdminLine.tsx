@@ -74,7 +74,7 @@ export const AdminLine = () => {
       accessor: (row) => (
         <div className="flex items-center justify-end gap-2">
           <button
-            // onClick={() => openEditModal(row)}
+            onClick={() => handleOpenEdit(row)}
             className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 
             rounded-md transition-colors cursor-pointer"
           >
