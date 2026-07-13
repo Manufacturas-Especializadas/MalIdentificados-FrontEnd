@@ -109,7 +109,7 @@ export const AdminLine = () => {
         <main className="relative">
           {loading ? (
             <div className="flex items-center justify-center py-20 text-slate-500 gap-2 font-medium">
-              <Loader2 />
+              <Loader2 className="animate-spin text-slate-700" size={20} />
               Cargando datos..
             </div>
           ) : (
