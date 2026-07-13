@@ -28,6 +28,22 @@ export const AdminLine = () => {
     setEditingLine(null);
   };
 
+  const handleFormSubmit = async (data: {
+    lineName: string;
+    isActive: boolean;
+  }) => {
+    try {
+      if (editingLine) {
+        await updateLine(editingLine.id, data.lineName, data.isActive);
+      } else {
+        await createLine(data.lineName);
+      }
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error en la operación:", error);
+    }
+  };
+
   const columns: Column<Line>[] = [
     {
       header: "Nombre de la linea",
