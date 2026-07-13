@@ -122,10 +122,7 @@ export const AdminLine = () => {
           </div>
 
           <button
-            // onClick={() => {
-            //   setTargetModuleId(activeModuleId);
-            //   setIsCreateOpen(true);
-            // }}
+            onClick={handleOpenCreate}
             className="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-5 
             rounded-xl text-sm transition-all duration-150 flex items-center justify-center gap-2 
             shadow-sm cursor-pointer self-start sm:self-center"
