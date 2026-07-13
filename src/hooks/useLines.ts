@@ -35,6 +35,25 @@ export const useLines = () => {
     return promise;
   };
 
+  const updateLine = async (
+    id: number,
+    lineName: string,
+    isActive: boolean,
+  ) => {
+    const promise = linesService.update(id, lineName, isActive);
+
+    toast.promise(promise, {
+      loading: "Guardando cambios...",
+      success: () => {
+        fetchLines();
+        return "Linea modificada correctamente";
+      },
+      error: "Error al actualizar",
+    });
+
+    return promise;
+  };
+
   useEffect(() => {
     fetchLines();
   }, [fetchLines]);
@@ -43,5 +62,6 @@ export const useLines = () => {
     lines,
     loading,
     createLine,
+    updateLine,
   };
 };
