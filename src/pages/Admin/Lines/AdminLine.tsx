@@ -13,6 +13,21 @@ export const AdminLine = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingLine, setEditingLine] = useState<Line | null>(null);
 
+  const handleOpenCreate = () => {
+    setEditingLine(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (line: Line) => {
+    setEditingLine(line);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingLine(null);
+  };
+
   const columns: Column<Line>[] = [
     {
       header: "Nombre de la linea",
