@@ -5,7 +5,7 @@ import type { Line } from "../../../types/types";
 import { useLines } from "../../../hooks/useLines";
 
 export const AdminLine = () => {
-  const { lines, loading } = useLines();
+  const { lines, loading, createLine, updateLine } = useLines();
 
   const navigate = useNavigate();
 
