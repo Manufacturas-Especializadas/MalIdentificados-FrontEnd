@@ -105,7 +105,8 @@ export const LineForm = ({
           onClick={onCancel}
           disabled={isSubmitting}
           className="px-5 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 
-          rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors disabled:opacity-50"
+          rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors disabled:opacity-50 
+          hover:cursor-pointer"
         >
           Cancelar
         </button>
@@ -114,7 +115,7 @@ export const LineForm = ({
           disabled={isSubmitting || !lineName.trim()}
           className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white 
           bg-slate-800 rounded-xl hover:bg-slate-900 transition-all shadow-sm active:scale-[0.98] 
-          disabled:opacity-70 disabled:hover:bg-slate-800"
+          disabled:opacity-70 disabled:hover:bg-slate-800 hover:cursor-pointer"
         >
           {isSubmitting ? (
             <>
