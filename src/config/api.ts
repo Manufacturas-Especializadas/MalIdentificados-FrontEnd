@@ -10,6 +10,7 @@ export const API_CONFIG = {
     lines: {
       getLines: "/api/Lines/getLines",
       create: "/api/Lines/create",
+      update: "/api/Lines/update/",
     },
   },
 };
