@@ -21,6 +21,20 @@ export const useLines = () => {
     }
   }, []);
 
+  const createLine = async (lineName: string) => {
+    const promise = linesService.create(lineName);
+    toast.promise(promise, {
+      loading: "Registrando nueva linea",
+      success: () => {
+        fetchLines();
+        return `Linea "${lineName}" creada con éxito`;
+      },
+      error: "Error al registrar la linea",
+    });
+
+    return promise;
+  };
+
   useEffect(() => {
     fetchLines();
   }, [fetchLines]);
@@ -28,5 +42,6 @@ export const useLines = () => {
   return {
     lines,
     loading,
+    createLine,
   };
 };
