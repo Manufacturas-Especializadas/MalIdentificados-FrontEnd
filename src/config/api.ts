@@ -12,5 +12,8 @@ export const API_CONFIG = {
       create: "/api/Lines/create",
       update: "/api/Lines/update/",
     },
+    scanning: {
+      start: "/api/Scanning/start",
+    },
   },
 };
