@@ -14,6 +14,19 @@ export interface ScanRecord {
   timestamp: Date;
 }
 
+export interface ScanDetailPayload {
+  scannedPartCode: string;
+  isCorrect: boolean;
+  scanDate: string;
+}
+
+export interface CompleteBatchPayload {
+  payrollNumber: number;
+  expectedPartCode: string;
+  requiredQuantity: number;
+  scans: ScanDetailPayload[];
+}
+
 export interface Line {
   id: number;
   lineName: string;
