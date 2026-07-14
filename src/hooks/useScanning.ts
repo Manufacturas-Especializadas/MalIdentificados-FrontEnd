@@ -1,34 +1,41 @@
 import { useState } from "react";
 import { scanningServce } from "../api/services/ScanningService";
 import { toast } from "sonner";
+import type { CompleteBatchPayload, ScanRecord } from "../types/types";
 
 export const useScanning = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [validationId, setValidationId] = useState<number | null>(null);
 
-  const startValidation = async (
+  const saveCompletedBatch = async (
     payrollNumber: number,
-    partNumberScanned: string,
-    quantity: number,
+    expectedPartCode: string,
+    requiredQuantity: number,
+    scannedItems: ScanRecord[],
   ) => {
     setLoading(true);
 
-    const promise = scanningServce
-      .scanning(payrollNumber, partNumberScanned, quantity)
-      .then((response) => {
-        setValidationId(response.validationId);
+    const payload: CompleteBatchPayload = {
+      payrollNumber,
+      expectedPartCode,
+      requiredQuantity,
+      scans: scannedItems.map((item) => ({
+        scannedPartCode: item.code,
+        isCorrect: item.isCorrect,
+        scanDate: item.timestamp.toISOString(),
+      })),
+    };
 
-        return response;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    const promise = scanningServce.saveBatch(payload).finally(() => {
+      setLoading(false);
+    });
 
     toast.promise(promise, {
-      loading: "Abriendo sesión de escaneo...",
-      success: () => `Sesión iniciada para el NP: ${partNumberScanned}`,
-      error: "Error al iniciar la sesión",
+      loading: "Guardando lote en la base de datos...",
+      success: () =>
+        `Lote guardado exitosamente para el NP: ${expectedPartCode}`,
+      error: "Error al guardar el lote de producción",
     });
 
     return promise;
@@ -41,7 +48,7 @@ export const useScanning = () => {
   return {
     loading,
     validationId,
-    startValidation,
+    saveCompletedBatch,
     resetValidation,
   };
 };
