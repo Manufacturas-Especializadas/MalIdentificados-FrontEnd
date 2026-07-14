@@ -7,6 +7,7 @@ export const useScanning = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [validationId, setValidationId] = useState<number | null>(null);
+  const [isValidating, setIsValidating] = useState<boolean>(false);
 
   const saveCompletedBatch = async (
     payrollNumber: number,
