@@ -46,6 +46,7 @@ export const useScanning = () => {
         scannedPartCode: item.code,
         isCorrect: item.isCorrect,
         scanDate: item.timestamp.toISOString(),
+        releasedByPayroll: item.releasedBy,
       })),
     };
 
