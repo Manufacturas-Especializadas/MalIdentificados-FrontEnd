@@ -7,6 +7,13 @@ export type ViewState =
   | "clients_crud"
   | "parts_crud";
 
+export interface ScanRecord {
+  id: string;
+  code: string;
+  isCorrect: boolean;
+  timestamp: Date;
+}
+
 export interface Line {
   id: number;
   lineName: string;
