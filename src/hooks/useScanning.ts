@@ -72,6 +72,8 @@ export const useScanning = () => {
     loading,
     validationId,
     saveCompletedBatch,
+    isValidating,
+    validateQualityApprover,
     resetValidation,
   };
 };
