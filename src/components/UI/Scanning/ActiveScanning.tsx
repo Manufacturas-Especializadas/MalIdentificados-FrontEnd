@@ -6,8 +6,6 @@ import {
   XCircle,
   AlertTriangle,
   Trash2,
-  Loader2,
-  UserCheck,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import type { ScanRecord } from "../../../types/types";
@@ -16,13 +14,11 @@ interface ActiveScanningProps {
   goal: number;
   scannedCount: number;
   scannedItems: ScanRecord[];
-  isValidating: boolean;
-  isBlocked: boolean;
   allowDelete: boolean;
+  isBlocked: boolean;
   onScanUnit: (scannedCode: string) => void;
-  onClearBlock: (approverPayroll: number) => void;
   onRemoveItem: (id: string, isCorrect: boolean) => void;
-  onValidateApprover: (payroll: number) => Promise<boolean>;
+  onClearWarning: () => void;
 }
 
 export const ActiveScanning = ({
@@ -30,22 +26,19 @@ export const ActiveScanning = ({
   scannedCount,
   scannedItems,
   onScanUnit,
-  isBlocked,
-  onClearBlock,
   onRemoveItem,
-  isValidating,
-  onValidateApprover,
   allowDelete,
+  isBlocked,
+  onClearWarning,
 }: ActiveScanningProps) => {
   const [currentScan, setCurrentScan] = useState("");
-  const [approverPayroll, setApproverPayroll] = useState("");
 
   const unitScanRef = useRef<HTMLInputElement>(null);
-  const approverRef = useRef<HTMLInputElement>(null);
+  const warningButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isBlocked) {
-      const timer = setTimeout(() => approverRef.current?.focus(), 100);
+      const timer = setTimeout(() => warningButtonRef.current?.focus(), 100);
       return () => clearTimeout(timer);
     } else {
       const timer = setTimeout(() => unitScanRef.current?.focus(), 100);
@@ -67,21 +60,6 @@ export const ActiveScanning = ({
     }
   };
 
-  const handleApproverSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!approverPayroll) return;
-
-    const payrollNum = Number(approverPayroll);
-    const isValid = await onValidateApprover(payrollNum);
-
-    if (isValid) {
-      onClearBlock(payrollNum);
-      setApproverPayroll("");
-    } else {
-      approverRef.current?.select();
-    }
-  };
-
   const progressPercentage = Math.min((scannedCount / (goal || 1)) * 100, 100);
 
   return (
@@ -90,59 +68,30 @@ export const ActiveScanning = ({
       items-start"
     >
       {isBlocked && (
-        <div className="absolute inset-0 z-50 bg-red-600/95 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center p-6 text-white text-center animate-fade-in shadow-2xl border-4 border-red-700">
+        <div
+          className="absolute inset-0 z-50 bg-red-600/95 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center p-6 
+          text-white text-center animate-fade-in shadow-2xl border-4 border-red-700"
+        >
           <div className="bg-white/10 p-4 rounded-full mb-4 animate-pulse">
             <AlertTriangle size={64} className="text-white" />
           </div>
           <h2 className="text-4xl font-black tracking-wider uppercase mb-2">
             ¡Alerta de Mezcla Detectada!
           </h2>
-          <p className="text-lg font-medium max-w-xl mb-6 text-red-100">
-            Se requiere autorización de Calidad para continuar.
+          <p className="text-lg font-medium max-w-xl mb-8 text-red-100">
+            Se escaneó un número de parte incorrecto. Por favor, retira la pieza
+            del contenedor.
           </p>
 
-          <form
-            onSubmit={handleApproverSubmit}
-            className="flex flex-col items-center gap-4 
-            w-full max-w-sm"
+          <button
+            ref={warningButtonRef}
+            onClick={onClearWarning}
+            className="w-full max-w-sm bg-slate-900 hover:bg-slate-800 text-white text-xl 
+            font-extrabold px-8 py-4 rounded-xl shadow-lg transition-all uppercase tracking-wider 
+            flex items-center justify-center gap-2 hover:cursor-pointer outline-none focus:ring-4 focus:ring-slate-400"
           >
-            <div className="relative w-full">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <UserCheck className="h-6 w-6 text-slate-400" />
-              </div>
-              <input
-                ref={approverRef}
-                type="number"
-                required
-                disabled={isValidating}
-                value={approverPayroll}
-                onChange={(e) => setApproverPayroll(e.target.value)}
-                placeholder="Escanea Nómina Autorizada"
-                className="w-full pl-12 pr-4 py-4 bg-white rounded-xl text-xl font-black 
-                text-slate-800 focus:outline-none focus:ring-4 focus:ring-red-400 
-                disabled:opacity-80 text-center tracking-wider placeholder:text-slate-400 
-                placeholder:text-base placeholder:font-bold"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isValidating || !approverPayroll}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xl 
-              font-extrabold px-8 py-4 rounded-xl shadow-lg transition-all uppercase tracking-wider 
-              flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:bg-slate-900 
-              hover:cursor-pointer"
-            >
-              {isValidating ? (
-                <>
-                  <Loader2 className="animate-spin" size={24} />
-                  Validando...
-                </>
-              ) : (
-                "Autorizar Liberación"
-              )}
-            </button>
-          </form>
+            Entendido, pieza retirada
+          </button>
         </div>
       )}
 
@@ -159,7 +108,7 @@ export const ActiveScanning = ({
             <input
               ref={unitScanRef}
               type="text"
-              disabled={isBlocked}
+              // disabled={isBlocked}
               value={currentScan}
               onChange={(e) =>
                 setCurrentScan(e.target.value.toUpperCase().replace(/'/g, "-"))
@@ -169,7 +118,8 @@ export const ActiveScanning = ({
               bg-slate-50 border-2 border-slate-300 rounded-2xl focus:outline-none 
               focus:border-sky-500 focus:bg-sky-50 transition-all uppercase tracking-widest 
               placeholder:text-slate-300 placeholder:text-2xl placeholder:font-bold disabled:opacity-50"
-              placeholder={isBlocked ? "SISTEMA BLOQUEADO" : "ESCANEA AQUÍ"}
+              // placeholder={isBlocked ? "SISTEMA BLOQUEADO" : "ESCANEA AQUÍ"}
+              placeholder="ESCANEA AQUÍ"
               autoFocus
             />
             <p className="text-center text-slate-400 mt-3 text-sm font-medium">
