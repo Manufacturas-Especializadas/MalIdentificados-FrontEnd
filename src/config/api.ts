@@ -6,5 +6,15 @@ if (!API_BASE_URL) {
 
 export const API_CONFIG = {
   baseUrl: API_BASE_URL,
-  endpoints: {},
+  endpoints: {
+    lines: {
+      getLines: "/api/Lines/getLines",
+      create: "/api/Lines/create",
+      update: "/api/Lines/update/",
+    },
+    scanning: {
+      start: "/api/Scanning/start",
+      validateApprover: "/api/Scanning/validate-approver/",
+    },
+  },
 };
