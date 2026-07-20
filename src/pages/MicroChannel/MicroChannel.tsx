@@ -17,6 +17,7 @@ export const MicroChannel = () => {
   const [scannedCount, setScannedCount] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [allowDelete, setAllowDelete] = useState(true);
+  const [resetHeader, setResetHeader] = useState(0);
 
   const handleStartSession = (
     payroll: number,
@@ -69,6 +70,7 @@ export const MicroChannel = () => {
 
           setTimeout(() => {
             handleStartSession(0, "", 0);
+            setResetHeader((prev) => prev + 1);
           }, 2500);
         } catch (error) {
           console.error("Error al procesar el lote final", error);
@@ -98,6 +100,7 @@ export const MicroChannel = () => {
           lineName="MicroChannel"
           isActive={isSessionActive}
           loading={loading}
+          resetTrigger={resetHeader}
           onStartSession={handleStartSession}
         />
 

@@ -7,12 +7,13 @@ import {
   Loader2,
   Play,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface SetupHeaderProps {
   lineName: string;
   isActive: boolean;
   loading: boolean;
+  resetTrigger: number;
   onStartSession: (
     payroll: number,
     partNumber: string,
@@ -24,6 +25,7 @@ export const SetupHeader = ({
   lineName,
   isActive,
   loading,
+  resetTrigger,
   onStartSession,
 }: SetupHeaderProps) => {
   const [payroll, setPayroll] = useState("");
@@ -32,6 +34,15 @@ export const SetupHeader = ({
 
   const partNumberRef = useRef<HTMLInputElement>(null);
   const quantityRef = useRef<HTMLInputElement>(null);
+  const payrollRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setPayroll("");
+    setPartNumber("");
+    setQuantity("");
+
+    payrollRef.current?.focus();
+  }, [resetTrigger]);
 
   const submitForm = () => {
     if (!payroll || !partNumber || !quantity) return;
@@ -96,6 +107,7 @@ export const SetupHeader = ({
               type="number"
               required
               autoFocus
+              ref={payrollRef}
               disabled={isActive}
               value={payroll}
               onChange={(e) => setPayroll(e.target.value)}
@@ -169,16 +181,13 @@ export const SetupHeader = ({
                 disabled={loading || !payroll || !partNumber || !quantity}
                 className="bg-slate-800 hover:bg-slate-900 text-white px-5 rounded-xl
                 font-bold flex items-center justify-center transition-all
-                disabled:opacity-50 shrink-0 shadow-sm"
+                disabled:opacity-50 shrink-0 shadow-sm hover:cursor-pointer"
                 title="Iniciar Lote"
               >
                 {loading ? (
                   <Loader2 className="animate-spin" size={20} />
                 ) : (
-                  <Play
-                    size={20}
-                    className="fill-current hover:cursor-pointer"
-                  />
+                  <Play size={20} className="fill-current" />
                 )}
               </button>
             )}
