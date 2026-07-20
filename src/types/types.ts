@@ -12,7 +12,7 @@ export interface ScanRecord {
   code: string;
   isCorrect: boolean;
   timestamp: Date;
-  releasedBy: number;
+  releasedBy?: number;
 }
 
 export interface ScanDetailPayload {
