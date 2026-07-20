@@ -5,8 +5,7 @@ import type { ScanRecord } from "../../types/types";
 import { useScanning } from "../../hooks/useScanning";
 
 export const MicroChannel = () => {
-  const { loading, saveCompletedBatch, isValidating, validateQualityApprover } =
-    useScanning();
+  const { loading, saveCompletedBatch } = useScanning();
 
   const [sessionConfig, setSessionConfig] = useState({
     payroll: 0,
@@ -67,6 +66,10 @@ export const MicroChannel = () => {
             sessionConfig.quantity,
             updatedItems,
           );
+
+          setTimeout(() => {
+            handleStartSession(0, "", 0);
+          }, 2500);
         } catch (error) {
           console.error("Error al procesar el lote final", error);
         }
@@ -76,25 +79,8 @@ export const MicroChannel = () => {
     }
   };
 
-  const handleClearBlock = (approverPayroll: number) => {
-    setScannedItems((prev) => {
-      const updated = [...prev];
-      const firstIncorrectIndex = updated.findIndex(
-        (item) => !item.isCorrect && !item.releasedBy,
-      );
-
-      if (firstIncorrectIndex !== -1) {
-        updated[firstIncorrectIndex] = {
-          ...updated[firstIncorrectIndex],
-          releasedBy: approverPayroll,
-        };
-      }
-      return updated;
-    });
-
+  const handleClearWarning = () => {
     setIsBlocked(false);
-
-    setAllowDelete(false);
   };
 
   const isSessionActive = !!sessionConfig.partNumber;
@@ -121,12 +107,10 @@ export const MicroChannel = () => {
             scannedCount={scannedCount}
             scannedItems={scannedItems}
             onScanUnit={handleScanUnit}
-            isBlocked={isBlocked}
-            onClearBlock={handleClearBlock}
             onRemoveItem={handleRemoveItem}
-            isValidating={isValidating}
-            onValidateApprover={validateQualityApprover}
             allowDelete={allowDelete}
+            isBlocked={isBlocked}
+            onClearWarning={handleClearWarning}
           />
         )}
       </div>
