@@ -34,6 +34,7 @@ export const useScanning = () => {
     payrollNumber: number,
     expectedPartCode: string,
     requiredQuantity: number,
+    shopOrder: string,
     scannedItems: ScanRecord[],
   ) => {
     setLoading(true);
@@ -41,6 +42,7 @@ export const useScanning = () => {
     const payload: CompleteBatchPayload = {
       payrollNumber,
       expectedPartCode,
+      shopOrder,
       requiredQuantity,
       scans: scannedItems.map((item) => ({
         scannedPartCode: item.code,

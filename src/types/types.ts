@@ -23,6 +23,7 @@ export interface ScanDetailPayload {
 
 export interface CompleteBatchPayload {
   payrollNumber: number;
+  shopOrder: string;
   expectedPartCode: string;
   requiredQuantity: number;
   scans: ScanDetailPayload[];

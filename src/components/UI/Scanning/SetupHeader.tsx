@@ -6,6 +6,7 @@ import {
   Hash,
   Loader2,
   Play,
+  ListOrdered,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -18,6 +19,7 @@ interface SetupHeaderProps {
     payroll: number,
     partNumber: string,
     quantity: number,
+    shopOrder: string,
   ) => void;
 }
 
@@ -30,24 +32,32 @@ export const SetupHeader = ({
 }: SetupHeaderProps) => {
   const [payroll, setPayroll] = useState("");
   const [partNumber, setPartNumber] = useState("");
+  const [shopOrder, setShopOrder] = useState("");
   const [quantity, setQuantity] = useState("");
 
   const partNumberRef = useRef<HTMLInputElement>(null);
   const quantityRef = useRef<HTMLInputElement>(null);
   const payrollRef = useRef<HTMLInputElement>(null);
+  const shopOrderRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setPayroll("");
     setPartNumber("");
+    setShopOrder("");
     setQuantity("");
 
     payrollRef.current?.focus();
   }, [resetTrigger]);
 
   const submitForm = () => {
-    if (!payroll || !partNumber || !quantity) return;
+    if (!payroll || !partNumber || !quantity || !shopOrder) return;
 
-    onStartSession(Number(payroll), partNumber.toUpperCase(), Number(quantity));
+    onStartSession(
+      Number(payroll),
+      partNumber.toUpperCase(),
+      Number(quantity),
+      shopOrder.toUpperCase(),
+    );
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -91,7 +101,7 @@ export const SetupHeader = ({
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-3 gap-5"
+        className="grid grid-cols-1 md:grid-cols-4 gap-5"
       >
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">
@@ -112,6 +122,33 @@ export const SetupHeader = ({
               value={payroll}
               onChange={(e) => setPayroll(e.target.value)}
               onKeyDown={(e) => handleKeyDown(e, partNumberRef)}
+              className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200
+              rounded-xl text-base font-semibold text-slate-800 focus:outline-none
+              focus:ring-2 focus:ring-sky-500 disabled:opacity-60
+              disabled:bg-slate-100 transition-all"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">
+            Shop Order
+          </label>
+
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+              <ListOrdered className="h-5 w-5 text-slate-400" />
+            </div>
+
+            <input
+              type="number"
+              required
+              autoFocus
+              ref={shopOrderRef}
+              disabled={isActive}
+              value={shopOrder}
+              onChange={(e) => setShopOrder(e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e, shopOrderRef)}
               className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200
               rounded-xl text-base font-semibold text-slate-800 focus:outline-none
               focus:ring-2 focus:ring-sky-500 disabled:opacity-60

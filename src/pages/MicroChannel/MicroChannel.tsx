@@ -10,6 +10,7 @@ export const MicroChannel = () => {
   const [sessionConfig, setSessionConfig] = useState({
     payroll: 0,
     partNumber: "",
+    shopOrder: "",
     quantity: 0,
   });
 
@@ -23,8 +24,9 @@ export const MicroChannel = () => {
     payroll: number,
     partNumber: string,
     quantity: number,
+    shopOrder: string,
   ) => {
-    setSessionConfig({ payroll, partNumber, quantity });
+    setSessionConfig({ payroll, partNumber, quantity, shopOrder });
     setScannedItems([]);
     setScannedCount(0);
     setIsBlocked(false);
@@ -65,11 +67,12 @@ export const MicroChannel = () => {
             sessionConfig.payroll,
             sessionConfig.partNumber,
             sessionConfig.quantity,
+            sessionConfig.shopOrder,
             updatedItems,
           );
 
           setTimeout(() => {
-            handleStartSession(0, "", 0);
+            handleStartSession(0, "", 0, "");
             setResetHeader((prev) => prev + 1);
           }, 2500);
         } catch (error) {
