@@ -121,7 +121,7 @@ export const SetupHeader = ({
               disabled={isActive}
               value={payroll}
               onChange={(e) => setPayroll(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, partNumberRef)}
+              onKeyDown={(e) => handleKeyDown(e, shopOrderRef)}
               className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200
               rounded-xl text-base font-semibold text-slate-800 focus:outline-none
               focus:ring-2 focus:ring-sky-500 disabled:opacity-60
@@ -143,12 +143,11 @@ export const SetupHeader = ({
             <input
               type="number"
               required
-              autoFocus
               ref={shopOrderRef}
               disabled={isActive}
               value={shopOrder}
               onChange={(e) => setShopOrder(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, shopOrderRef)}
+              onKeyDown={(e) => handleKeyDown(e, partNumberRef)}
               className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200
               rounded-xl text-base font-semibold text-slate-800 focus:outline-none
               focus:ring-2 focus:ring-sky-500 disabled:opacity-60
@@ -215,7 +214,9 @@ export const SetupHeader = ({
             {!isActive && (
               <button
                 type="submit"
-                disabled={loading || !payroll || !partNumber || !quantity}
+                disabled={
+                  loading || !payroll || !shopOrder || !partNumber || !quantity
+                }
                 className="bg-slate-800 hover:bg-slate-900 text-white px-5 rounded-xl
                 font-bold flex items-center justify-center transition-all
                 disabled:opacity-50 shrink-0 shadow-sm hover:cursor-pointer"
