@@ -18,7 +18,7 @@ export const Navbar = () => {
             </div>
             <div className="hidden md:block h-6 w-px bg-slate-200" />{" "}
             <h1 className="text-lg font-semibold tracking-tight text-slate-800">
-              MAL <span className="text-blue-600">IDENTIFICADOS</span>
+              VALIDACION D<span className="text-blue-600">E EMPAQUE</span>
             </h1>
           </div>
         </div>
