@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { scanningServce } from "../api/services/ScanningService";
 import { toast } from "sonner";
-import type { CompleteBatchPayload, ScanRecord } from "../types/types";
+import type {
+  CompleteBatchPayload,
+  ScanRecord,
+  Validation,
+} from "../types/types";
 
 export const useScanning = () => {
+  const [validations, setValidations] = useState<Validation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const [validationId, setValidationId] = useState<number | null>(null);
@@ -29,6 +34,19 @@ export const useScanning = () => {
       setIsValidating(false);
     }
   };
+
+  const fetchValidations = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await scanningServce.getValidations();
+      setValidations(response);
+    } catch (error: any) {
+      console.error("Error al obtener los datos");
+      toast.error("No se pudo obtener los datos");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const saveCompletedBatch = async (
     payrollNumber: number,
@@ -70,6 +88,10 @@ export const useScanning = () => {
     setValidationId(null);
   };
 
+  useEffect(() => {
+    fetchValidations();
+  }, []);
+
   return {
     loading,
     validationId,
@@ -77,5 +99,7 @@ export const useScanning = () => {
     isValidating,
     validateQualityApprover,
     resetValidation,
+    validations,
+    fetchValidations,
   };
 };
