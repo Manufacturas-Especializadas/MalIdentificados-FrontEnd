@@ -43,3 +43,22 @@ export interface AdminModule {
   icon: LucideIcon;
   viewTarget: ViewState;
 }
+
+export interface Validation {
+  id: number;
+  containerNumber: string;
+  payrollNumber: number;
+  expectedPartCode: string;
+  requiredQuantity: number;
+  scannedQuantity: number;
+  status: string;
+  scanDetails: ScanDetails[];
+}
+
+export interface ScanDetails {
+  id: number;
+  scannedPartCode: string;
+  isCorrect: boolean;
+  scanDate: string;
+  releasedByPayroll: number;
+}

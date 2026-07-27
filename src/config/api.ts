@@ -15,6 +15,7 @@ export const API_CONFIG = {
     scanning: {
       start: "/api/Scanning/start",
       validateApprover: "/api/Scanning/validate-approver/",
+      validations: "/api/Traceability/validations",
     },
   },
 };
