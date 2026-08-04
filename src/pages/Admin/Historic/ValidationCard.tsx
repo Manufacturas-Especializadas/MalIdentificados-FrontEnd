@@ -14,6 +14,16 @@ import { useMemo, useState } from "react";
 export const ValidationCard = ({ validation }: { validation: Validation }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const parseUtcDate = (value: string): Date => {
+    if (!value) {
+      return new Date(Number.NaN);
+    }
+
+    const hasTimeZone = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value);
+
+    return new Date(hasTimeZone ? value : `${value}Z`);
+  };
+
   const firstScanDate = useMemo(() => {
     const scanDates =
       validation.scanDetails
@@ -37,16 +47,6 @@ export const ValidationCard = ({ validation }: { validation: Validation }) => {
     100,
   );
   const hasErrors = validation.scanDetails?.some((scan) => !scan.isCorrect);
-
-  const parseUtcDate = (value: string): Date => {
-    if (!value) {
-      return new Date(Number.NaN);
-    }
-
-    const hasTimeZone = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value);
-
-    return new Date(hasTimeZone ? value : `${value}Z`);
-  };
 
   return (
     <div
