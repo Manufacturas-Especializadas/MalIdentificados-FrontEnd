@@ -6,12 +6,30 @@ import {
   ChevronDown,
   ChevronUp,
   AlertTriangle,
+  CalendarDays,
 } from "lucide-react";
 import type { Validation } from "../../../types/types";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export const ValidationCard = ({ validation }: { validation: Validation }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const firstScanDate = useMemo(() => {
+    const scanDates =
+      validation.scanDetails
+        ?.map((scan) => new Date(scan.scanDate))
+        .filter((date) => !Number.isNaN(date.getTime())) ?? [];
+
+    if (scanDates.length === 0) {
+      return null;
+    }
+
+    const earliestTimestamp = Math.min(
+      ...scanDates.map((date) => date.getTime()),
+    );
+
+    return new Date(earliestTimestamp);
+  }, [validation.scanDetails]);
 
   const isCompleted = validation.status === "completed";
   const progress = Math.min(
@@ -50,6 +68,22 @@ export const ValidationCard = ({ validation }: { validation: Validation }) => {
           <h3 className="text-lg font-black text-slate-800">
             {validation.expectedPartCode}
           </h3>
+
+          <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-slate-500">
+            <CalendarDays size={14} />
+
+            <span>
+              {firstScanDate
+                ? firstScanDate.toLocaleString("es-MX", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+                : "Sin fecha registrada"}
+            </span>
+          </div>
         </div>
 
         <div className="text-right">
@@ -66,13 +100,15 @@ export const ValidationCard = ({ validation }: { validation: Validation }) => {
             </span>
           </p>
         </div>
+        <span className="text-xs font-bold">
+          {validation.payrollNumber || "N/A"}
+        </span>
       </div>
 
       <div className="h-1.5 w-full bg-slate-100">
         <div
-          className={`h-full transition-all duration-500 ${
-            isCompleted ? "bg-emerald-500" : "bg-sky-500"
-          }`}
+          className={`h-full transition-all duration-500 ${isCompleted ? "bg-emerald-500" : "bg-sky-500"
+            }`}
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -113,10 +149,9 @@ export const ValidationCard = ({ validation }: { validation: Validation }) => {
                   title={`Código: ${scan.scannedPartCode}\nHora: ${new Date(scan.scanDate).toLocaleTimeString()}`}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg 
                       text-xs font-bold border transition-all cursor-help
-                    ${
-                      scan.isCorrect
-                        ? "bg-white border-emerald-200 text-emerald-700 shadow-sm"
-                        : "bg-red-50 border-red-300 text-red-700 shadow-sm ring-2 ring-red-100"
+                    ${scan.isCorrect
+                      ? "bg-white border-emerald-200 text-emerald-700 shadow-sm"
+                      : "bg-red-50 border-red-300 text-red-700 shadow-sm ring-2 ring-red-100"
                     }`}
                 >
                   {scan.isCorrect ? (
@@ -127,10 +162,10 @@ export const ValidationCard = ({ validation }: { validation: Validation }) => {
                   <span>
                     {scan.isCorrect
                       ? new Date(scan.scanDate).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        })
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })
                       : scan.scannedPartCode}
                   </span>
                 </div>
