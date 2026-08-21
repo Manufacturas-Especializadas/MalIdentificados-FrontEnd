@@ -8,6 +8,7 @@ export const App = () => {
     <BrowserRouter>
       <Navbar />
       <Toaster richColors position="top-right" />
+
       <main>
         <MyRoutes />
       </main>
