@@ -4,7 +4,7 @@ import { SetupHeader } from "../../components/UI/Scanning/SetupHeader";
 import type { ScanRecord } from "../../types/types";
 import { useScanning } from "../../hooks/useScanning";
 
-export const Line5 = () => {
+export const Line4Empaques = () => {
     const { loading, saveCompletedBatch } = useScanning();
 
     const [sessionConfig, setSessionConfig] = useState({
@@ -109,7 +109,7 @@ export const Line5 = () => {
         architecture-fade-in"
             >
                 <SetupHeader
-                    lineName="Línea 5"
+                    lineName="Línea 4 Empaques"
                     isActive={isSessionActive}
                     loading={loading}
                     resetTrigger={resetHeader}
