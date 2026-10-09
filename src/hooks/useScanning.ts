@@ -3,11 +3,10 @@ import { scanningServce } from "../api/services/ScanningService";
 import { toast } from "sonner";
 import type {
   CompleteBatchPayload,
-  ScanRecord,
   Validation,
 } from "../types/types";
 
-export const useScanning = () => {
+export const useScanning = ({ loadHistory = true } = {}) => {
   const [validations, setValidations] = useState<Validation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -40,8 +39,8 @@ export const useScanning = () => {
     try {
       const response = await scanningServce.getValidations();
       setValidations(response);
-    } catch (error: any) {
-      console.error("Error al obtener los datos");
+    } catch (error) {
+      console.error("Error al obtener los datos", error);
       toast.error("No se pudo obtener los datos");
     } finally {
       setLoading(false);
@@ -49,26 +48,9 @@ export const useScanning = () => {
   }, []);
 
   const saveCompletedBatch = async (
-    payrollNumber: number,
-    expectedPartCode: string,
-    requiredQuantity: number,
-    shopOrder: string,
-    scannedItems: ScanRecord[],
+    payload: CompleteBatchPayload,
   ) => {
     setLoading(true);
-
-    const payload: CompleteBatchPayload = {
-      payrollNumber,
-      expectedPartCode,
-      shopOrder,
-      requiredQuantity,
-      scans: scannedItems.map((item) => ({
-        scannedPartCode: item.code,
-        isCorrect: item.isCorrect,
-        scanDate: item.timestamp.toISOString(),
-        releasedByPayroll: item.releasedBy,
-      })),
-    };
 
     const promise = scanningServce.saveBatch(payload).finally(() => {
       setLoading(false);
@@ -77,7 +59,7 @@ export const useScanning = () => {
     toast.promise(promise, {
       loading: "Guardando lote en la base de datos...",
       success: () =>
-        `Lote guardado exitosamente para el NP: ${expectedPartCode}`,
+        `Lote guardado exitosamente para el NP: ${payload.expectedPartCode}`,
       error: "Error al guardar el lote de producción",
     });
 
@@ -89,8 +71,10 @@ export const useScanning = () => {
   };
 
   useEffect(() => {
-    fetchValidations();
-  }, []);
+    if (!loadHistory) return;
+    const timer = window.setTimeout(() => void fetchValidations(), 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchValidations, loadHistory]);
 
   return {
     loading,

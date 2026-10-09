@@ -19,14 +19,38 @@ export interface ScanDetailPayload {
   scannedPartCode: string;
   isCorrect: boolean;
   scanDate: string;
+  releasedByPayroll?: number | null;
 }
 
-export interface CompleteBatchPayload {
+export type ValidationMode = "shopOrder" | "container";
+
+export type SessionConfig = {
+  payroll: number;
+  partNumber: string;
+  quantity: number;
+} & (
+  | { validationMode: "shopOrder"; shopOrder: string; containerNumber?: never }
+  | { validationMode: "container"; containerNumber: string; shopOrder?: never }
+);
+
+export type ScanningContract =
+  | { version: "legacy" }
+  | { version: "line-container"; lineId: number };
+
+export type CompleteBatchPayload = {
   payrollNumber: number;
-  shopOrder: string;
   expectedPartCode: string;
   requiredQuantity: number;
   scans: ScanDetailPayload[];
+} & (
+  | { shopOrder: string; validationMode?: never; lineId?: never; containerNumber?: never }
+  | { shopOrder: string; validationMode: "shopOrder"; lineId: number; containerNumber?: never }
+  | { containerNumber: string; validationMode: "container"; lineId: number; shopOrder?: never }
+);
+
+export interface CompleteBatchResponse {
+  validationId: number;
+  message: string;
 }
 
 export interface Line {
