@@ -1,5 +1,5 @@
 import { API_CONFIG } from "../../config/api";
-import type { CompleteBatchPayload, Validation } from "../../types/types";
+import type { CompleteBatchPayload, CompleteBatchResponse, Validation } from "../../types/types";
 import { apiClient } from "../client";
 
 class ScanningService {
@@ -18,8 +18,8 @@ class ScanningService {
     return apiClient.get<Validation[]>(this.getValidationsEndpoint);
   }
 
-  async saveBatch(payload: CompleteBatchPayload): Promise<any> {
-    return apiClient.post<any>(this.scanningEndpoint, payload);
+  async saveBatch(payload: CompleteBatchPayload): Promise<CompleteBatchResponse> {
+    return apiClient.post<CompleteBatchResponse>(this.scanningEndpoint, payload, { timeout: 30000 });
   }
 }
 

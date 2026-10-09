@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import type { ScanRecord } from "../../../types/types";
+import { legacyCodeInput } from "../../../utils/scanning";
 
 interface ActiveScanningProps {
   goal: number;
@@ -16,6 +17,8 @@ interface ActiveScanningProps {
   scannedItems: ScanRecord[];
   allowDelete: boolean;
   isBlocked: boolean;
+  captureDisabled?: boolean;
+  transformInput?: (value: string) => string;
   onScanUnit: (scannedCode: string) => void;
   onRemoveItem: (id: string, isCorrect: boolean) => void;
   onClearWarning: () => void;
@@ -29,34 +32,58 @@ export const ActiveScanning = ({
   onRemoveItem,
   allowDelete,
   isBlocked,
+  captureDisabled = false,
+  transformInput = legacyCodeInput,
   onClearWarning,
 }: ActiveScanningProps) => {
   const [currentScan, setCurrentScan] = useState("");
+  const pendingScanRef = useRef("");
 
   const unitScanRef = useRef<HTMLInputElement>(null);
-  const warningButtonRef = useRef<HTMLButtonElement>(null);
+  const warningPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isBlocked) {
-      const timer = setTimeout(() => warningButtonRef.current?.focus(), 100);
-      return () => clearTimeout(timer);
-    } else {
-      const timer = setTimeout(() => unitScanRef.current?.focus(), 100);
-      return () => clearTimeout(timer);
-    }
-  }, [isBlocked]);
+    const focusCapture = () => {
+      if (isBlocked) warningPanelRef.current?.focus();
+      else if (!captureDisabled) unitScanRef.current?.focus();
+    };
+    const clearPartialScan = () => {
+      pendingScanRef.current = "";
+      setCurrentScan("");
+    };
+    const restoreFocus = () => { clearPartialScan(); focusCapture(); };
+    const onVisibility = () => { if (!document.hidden) restoreFocus(); else clearPartialScan(); };
+    const guardAlertEnter = (event: KeyboardEvent) => {
+      if (isBlocked && event.key === "Enter") { event.preventDefault(); event.stopPropagation(); }
+    };
+    focusCapture();
+    window.addEventListener("focus", restoreFocus);
+    window.addEventListener("blur", clearPartialScan);
+    document.addEventListener("visibilitychange", onVisibility);
+    document.addEventListener("keydown", guardAlertEnter, true);
+    return () => {
+      window.removeEventListener("focus", restoreFocus);
+      window.removeEventListener("blur", clearPartialScan);
+      document.removeEventListener("visibilitychange", onVisibility);
+      document.removeEventListener("keydown", guardAlertEnter, true);
+    };
+  }, [isBlocked, captureDisabled]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === "Tab") {
+    if ((e.key === "Enter" || e.key === "Tab") && !e.shiftKey) {
       e.preventDefault();
 
-      if (isBlocked) return;
+      if (isBlocked || captureDisabled || e.repeat) return;
 
-      const value = currentScan.trim().toUpperCase();
+      const value = pendingScanRef.current.trim();
       if (!value) return;
 
-      onScanUnit(value);
+      // Consume before invoking the parent: Enter+Tab/CRLF cannot submit twice,
+      // even before React renders the cleared controlled input.
+      pendingScanRef.current = "";
+      e.currentTarget.value = "";
       setCurrentScan("");
+      onScanUnit(value);
     }
   };
 
@@ -69,6 +96,11 @@ export const ActiveScanning = ({
     >
       {isBlocked && (
         <div
+          ref={warningPanelRef}
+          tabIndex={-1}
+          role="alertdialog"
+          aria-modal="true"
+          aria-label="Alerta de mezcla detectada"
           className="absolute inset-0 z-50 bg-red-600/95 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center p-6 
           text-white text-center animate-fade-in shadow-2xl border-4 border-red-700"
         >
@@ -84,14 +116,20 @@ export const ActiveScanning = ({
           </p>
 
           <button
-            ref={warningButtonRef}
-            onClick={onClearWarning}
+            type="button"
+            onKeyDown={(event) => { if (event.key === "Enter") event.preventDefault(); }}
+            onClick={() => {
+              pendingScanRef.current = "";
+              setCurrentScan("");
+              onClearWarning();
+            }}
             className="w-full max-w-sm bg-slate-900 hover:bg-slate-800 text-white text-xl 
             font-extrabold px-8 py-4 rounded-xl shadow-lg transition-all uppercase tracking-wider 
             flex items-center justify-center gap-2 hover:cursor-pointer outline-none focus:ring-4 focus:ring-slate-400"
           >
             Entendido, pieza retirada
           </button>
+          <p className="mt-3 text-sm">Confirma con clic o con Tab y espacio. Enter del lector no confirma.</p>
         </div>
       )}
 
@@ -108,18 +146,30 @@ export const ActiveScanning = ({
             <input
               ref={unitScanRef}
               type="text"
-              // disabled={isBlocked}
+              disabled={isBlocked || captureDisabled}
+              aria-label="Escanear Pieza"
+              autoComplete="off"
               value={currentScan}
-              onChange={(e) =>
-                setCurrentScan(e.target.value.toUpperCase().replace(/'/g, "-"))
-              }
+              onChange={(e) => {
+                const value = transformInput(e.target.value);
+                pendingScanRef.current = value;
+                setCurrentScan(value);
+              }}
+              onBlur={() => {
+                pendingScanRef.current = "";
+                setCurrentScan("");
+                requestAnimationFrame(() => {
+                  if (!document.hasFocus() || unitScanRef.current?.disabled) return;
+                  const target = document.activeElement;
+                  if (target === document.body || target === null) unitScanRef.current?.focus();
+                });
+              }}
               onKeyDown={handleKeyDown}
               className="w-full text-center text-3xl font-black text-slate-800 py-6 
               bg-slate-50 border-2 border-slate-300 rounded-2xl focus:outline-none 
-              focus:border-sky-500 focus:bg-sky-50 transition-all uppercase tracking-widest 
+              focus:border-sky-500 focus:bg-sky-50 transition-all tracking-widest
               placeholder:text-slate-300 placeholder:text-2xl placeholder:font-bold disabled:opacity-50"
-              // placeholder={isBlocked ? "SISTEMA BLOQUEADO" : "ESCANEA AQUÍ"}
-              placeholder="ESCANEA AQUÍ"
+              placeholder={isBlocked || captureDisabled ? "LECTURAS BLOQUEADAS" : "ESCANEA AQUÍ"}
               autoFocus
             />
             <p className="text-center text-slate-400 mt-3 text-sm font-medium">
@@ -244,7 +294,11 @@ export const ActiveScanning = ({
 
                     {allowDelete && (
                       <button
-                        onClick={() => onRemoveItem(item.id, item.isCorrect)}
+                        type="button"
+                        onClick={() => {
+                          onRemoveItem(item.id, item.isCorrect);
+                          unitScanRef.current?.focus();
+                        }}
                         className={`p-2 rounded-lg transition-colors hover:cursor-pointer ${
                           item.isCorrect
                             ? "text-slate-400 hover:text-red-500 hover:bg-red-50"
