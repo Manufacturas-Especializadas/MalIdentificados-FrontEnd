@@ -14,10 +14,20 @@ import { useMemo, useState } from "react";
 export const ValidationCard = ({ validation }: { validation: Validation }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const parseUtcDate = (value: string): Date => {
+    if (!value) {
+      return new Date(Number.NaN);
+    }
+
+    const hasTimeZone = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value);
+
+    return new Date(hasTimeZone ? value : `${value}Z`);
+  };
+
   const firstScanDate = useMemo(() => {
     const scanDates =
       validation.scanDetails
-        ?.map((scan) => new Date(scan.scanDate))
+        ?.map((scan) => parseUtcDate(scan.scanDate))
         .filter((date) => !Number.isNaN(date.getTime())) ?? [];
 
     if (scanDates.length === 0) {
@@ -146,7 +156,9 @@ export const ValidationCard = ({ validation }: { validation: Validation }) => {
               {validation.scanDetails.map((scan: any) => (
                 <div
                   key={scan.id}
-                  title={`Código: ${scan.scannedPartCode}\nHora: ${new Date(scan.scanDate).toLocaleTimeString()}`}
+                  title={`Código: ${scan.scannedPartCode}\nHora: ${parseUtcDate(
+                    scan.scanDate,
+                  ).toLocaleTimeString("es-MX")}`}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg 
                       text-xs font-bold border transition-all cursor-help
                     ${scan.isCorrect
@@ -161,7 +173,7 @@ export const ValidationCard = ({ validation }: { validation: Validation }) => {
                   )}
                   <span>
                     {scan.isCorrect
-                      ? new Date(scan.scanDate).toLocaleTimeString([], {
+                      ? parseUtcDate(scan.scanDate).toLocaleTimeString("es-MX", {
                         hour: "2-digit",
                         minute: "2-digit",
                         second: "2-digit",
